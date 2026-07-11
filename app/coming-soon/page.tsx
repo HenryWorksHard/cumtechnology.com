@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { TOKEN_CONFIG } from '../config/token'
 
 export default function ComingSoon() {
   const [glitchText, setGlitchText] = useState('COMING SOON')
@@ -119,9 +120,9 @@ export default function ComingSoon() {
         
         {/* Social links */}
         <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
-          <a 
-            href="https://x.com/CxM5H0T" 
-            target="_blank" 
+          <a
+            href={TOKEN_CONFIG.TWITTER}
+            target="_blank"
             rel="noopener noreferrer"
             style={{
               background: '#ff00ff',
@@ -133,7 +134,7 @@ export default function ComingSoon() {
               border: '2px solid #fff'
             }}
           >
-            FOLLOW @CxM5H0T
+            FOLLOW {TOKEN_CONFIG.TWITTER_HANDLE}
           </a>
         </div>
         

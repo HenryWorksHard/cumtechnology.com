@@ -2,32 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react'
 import GlitchyAscii from './components/GlitchyAscii'
-
-// ============================================
-// CENTRALIZED CONFIG - UPDATE THESE AFTER LAUNCH
-// ============================================
-const TOKEN_CONFIG = {
-  // Contract Address - REMOVED (coming soon)
-  CA: '',
-  CA_DISPLAY: 'TBA', // What shows on buttons
-  
-  // Buy Link - REMOVED (coming soon)
-  BUY_LINK: '#',
-  
-  // Social Links
-  TWITTER: 'https://x.com/CxM5H0T',
-  TWITTER_HANDLE: '@CxM5H0T',
-  GITHUB: 'https://github.com/Cumtek-PTY-LTD',
-  
-  // DEX Links - REMOVED (coming soon)
-  PUMP_FUN: '#',
-  DEXSCREENER: '#',
-  
-  // Token Info
-  TOKEN_NAME: '$CUM',
-  TOKEN_SYMBOL: 'CUM',
-}
-// ============================================
+import { TOKEN_CONFIG } from './config/token'
 
 // The CumTek Team
 const cumtekTeam = [
@@ -719,6 +694,10 @@ export default function Home() {
             </a>
             <button 
               onClick={() => {
+                if (!TOKEN_CONFIG.LAUNCHED) {
+                  alert('CA: TBA. Not launched yet. 还没发射。')
+                  return
+                }
                 navigator.clipboard.writeText(TOKEN_CONFIG.CA)
                 alert(`CA copied! (${TOKEN_CONFIG.CA_DISPLAY})`)
               }}
@@ -727,14 +706,14 @@ export default function Home() {
             >
               CA: {TOKEN_CONFIG.CA_DISPLAY}
             </button>
-            <a 
-              href="https://github.com/Cumtek-PTY-LTD" 
-              target="_blank" 
+            <a
+              href={TOKEN_CONFIG.GITHUB}
+              target="_blank"
               rel="noopener noreferrer"
-              className="chaos-btn" 
+              className="chaos-btn"
               style={{ padding: '8px 20px', fontSize: '14px', background: '#24292e', border: '2px solid #fff', color: '#fff', textDecoration: 'none' }}
             >
-              Cumtek-PTY-LTD GitHub
+              CUMTEK GitHub
             </a>
           </div>
           {/* FAKE ADULT SITE LOGOS - LEFT SIDE */}
@@ -1476,6 +1455,10 @@ export default function Home() {
             <div style={{ padding: '12px' }}>
               <button 
                 onClick={() => {
+                  if (!TOKEN_CONFIG.LAUNCHED) {
+                    alert('CA: TBA. Not launched yet. 还没发射。')
+                    return
+                  }
                   navigator.clipboard.writeText(TOKEN_CONFIG.CA)
                   alert(`CA copied! (${TOKEN_CONFIG.CA_DISPLAY}) | 合约地址已复制！`)
                 }}
@@ -1493,7 +1476,7 @@ export default function Home() {
                 }}
                 className="shake-hover"
               >
-                {TOKEN_CONFIG.CA === 'COMING_SOON' ? 'COMING_SOON_STOP_ASKING' : TOKEN_CONFIG.CA}
+                {TOKEN_CONFIG.LAUNCHED ? TOKEN_CONFIG.CA : 'TBA_STOP_ASKING'}
               </button>
               <p style={{ textAlign: 'center', fontSize: '13px', color: '#888', margin: '10px 0 0 0' }}>
                 CLICK TO COPY 点击复制
@@ -1510,6 +1493,9 @@ export default function Home() {
               </p>
               <p style={{ margin: '8px 0' }}>
                 DexScreener: {TOKEN_CONFIG.DEXSCREENER ? <a href={TOKEN_CONFIG.DEXSCREENER} target="_blank" rel="noopener noreferrer" style={{ color: '#00ff00', fontWeight: 'bold' }}>CHART</a> : <span style={{ color: '#888' }}>COMING SOON</span>}
+              </p>
+              <p style={{ margin: '8px 0' }}>
+                GitHub: <a href={TOKEN_CONFIG.GITHUB} target="_blank" rel="noopener noreferrer" style={{ color: '#00ffff', fontWeight: 'bold' }}>SOURCE CODE</a> <span style={{ color: '#0f0' }}>[PUBLIC]</span>
               </p>
               <p style={{ margin: '8px 0' }}>
                 Website: <a href="/" style={{ color: '#ff00ff', fontWeight: 'bold' }}>cumtechnology.com</a>
