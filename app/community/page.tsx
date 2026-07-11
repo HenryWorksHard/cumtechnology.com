@@ -107,6 +107,17 @@ export default function CommunityPage() {
     return () => clearInterval(interval)
   }, [])
 
+  // Returning visitors keep their name (no repeated join announcements)
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('cumtek_visitor_name')
+      if (saved) {
+        setVisitorName(saved)
+        setHasJoined(true)
+      }
+    } catch {}
+  }, [])
+
   // Keep the team talking while someone is watching
   useEffect(() => {
     const interval = setInterval(() => {
@@ -152,14 +163,23 @@ export default function CommunityPage() {
     })
   }
 
+  // Names that would let visitors impersonate the team or the system
+  const RESERVED_NAMES = ['system', 'cumshot', 'cummy', 'woody', 'johnny', 'frederick', 'noose', 'admin', 'mod']
+
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault()
-    if (visitorName.trim()) {
-      setHasJoined(true)
-      postMessage('SYSTEM', `${visitorName} has entered the cum zone`)
-        .then(() => fetchMessages())
-        .catch(e => console.error('Failed to post join message:', e))
+    const name = visitorName.trim()
+    if (!name) return
+    if (RESERVED_NAMES.includes(name.toLowerCase())) {
+      alert(`NICE TRY. "${name}" is taken. 想都别想。 Pick your own name.`)
+      return
     }
+    setVisitorName(name)
+    setHasJoined(true)
+    try { localStorage.setItem('cumtek_visitor_name', name) } catch {}
+    postMessage('SYSTEM', `${name} has entered the cum zone`)
+      .then(() => fetchMessages())
+      .catch(e => console.error('Failed to post join message:', e))
   }
 
   const handleSendMessage = async (e: React.FormEvent) => {
