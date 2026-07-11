@@ -1,10 +1,15 @@
 import { NextResponse } from 'next/server'
+import { SUPABASE_URL, supabaseHeaders } from '../../../config/supabase'
 
 // ============================================
-// STATELESS AUTO-CHAT - NO DATABASE
-// The client keeps chat history in the browser and sends the
-// last message as context. This route only generates a reply.
+// AUTO-CHAT - shared chat backed by Supabase
+// Clients trigger this route; it reads the last message from
+// the DB, generates an in-character AI reply, and saves it so
+// every visitor sees the same conversation. A time guard stops
+// multiple open tabs from flooding the chat.
 // ============================================
+
+const MIN_SECONDS_BETWEEN_CHARACTER_POSTS = 15
 
 // ============================================
 // CUMTEK CHARACTERS - AI PERSONALITIES
@@ -81,6 +86,35 @@ function fallbackFor(characterId: string): string {
   return msgs[Math.floor(Math.random() * msgs.length)]
 }
 
+interface StoredMessage {
+  character_id: string | null
+  visitor_name: string | null
+  content: string
+  created_at: string
+}
+
+async function getLastMessage(): Promise<StoredMessage | null> {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/messages?select=character_id,visitor_name,content,created_at&order=created_at.desc&limit=1`,
+      { headers: supabaseHeaders, cache: 'no-store' }
+    )
+    const data = await res.json()
+    return data[0] || null
+  } catch (e) {
+    console.error('Failed to get last message:', e)
+    return null
+  }
+}
+
+async function saveMessage(characterId: string, content: string) {
+  await fetch(`${SUPABASE_URL}/rest/v1/messages`, {
+    method: 'POST',
+    headers: { ...supabaseHeaders, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ character_id: characterId, content }),
+  })
+}
+
 // Generate message using Groq (free, fast, unfiltered)
 async function generateWithGroq(character: typeof CHARACTERS[0], lastMessage: string, lastSender: string): Promise<string> {
   const groqKey = process.env.GROQ_API_KEY
@@ -120,17 +154,31 @@ async function generateWithGroq(character: typeof CHARACTERS[0], lastMessage: st
   }
 }
 
-// Main handler - client sends last message context, gets a character reply
+// Main handler - reads last message from the DB, generates a
+// character reply, saves it for everyone
 export async function POST(request: Request) {
   try {
     const body = await request.json().catch(() => ({}))
-    const targetCharacter = body.character_id
-    const lastContent: string = (body.last_content || 'tek is life').slice(0, 500)
-    const lastSender: string = (body.last_sender || 'VISITOR').slice(0, 50)
-    const lastCharacterId: string | null = body.last_character_id || null
+
+    const lastMsg = await getLastMessage()
+    const lastContent = lastMsg?.content || 'tek is life'
+    const lastCharacterId = lastMsg?.character_id || null
+    const lastSender = lastMsg?.character_id
+      ? CHARACTERS.find(c => c.id === lastMsg.character_id)?.name || 'UNKNOWN'
+      : lastMsg?.visitor_name || 'VISITOR'
+
+    // Flood guard: if a character posted moments ago, don't post again.
+    // Visitor messages skip the guard so replies to humans stay snappy.
+    if (lastMsg?.character_id && lastMsg.created_at) {
+      const ageSeconds = (Date.now() - new Date(lastMsg.created_at).getTime()) / 1000
+      if (ageSeconds < MIN_SECONDS_BETWEEN_CHARACTER_POSTS) {
+        return NextResponse.json({ success: true, skipped: true })
+      }
+    }
 
     // Pick character - never reply to yourself
     let pool = CHARACTERS.filter(c => c.id !== lastCharacterId)
+    const targetCharacter = body.character_id
     if (targetCharacter) {
       const chosen = CHARACTERS.find(c => c.id === targetCharacter)
       if (chosen && chosen.id !== lastCharacterId) pool = [chosen]
@@ -138,6 +186,7 @@ export async function POST(request: Request) {
     const character = pool[Math.floor(Math.random() * pool.length)]
 
     const content = await generateWithGroq(character, lastContent, lastSender)
+    await saveMessage(character.id, content)
 
     return NextResponse.json({
       success: true,
@@ -157,11 +206,11 @@ export async function POST(request: Request) {
 export async function GET() {
   return NextResponse.json({
     status: 'active',
-    mode: 'stateless (no database)',
+    mode: 'shared chat (supabase)',
     characters: CHARACTERS.map(c => ({ id: c.id, name: c.name })),
     description: 'CUMTEK Community Auto-Chat API',
     usage: {
-      'POST /': 'Send {last_content, last_sender, last_character_id} - returns a character reply',
+      'POST /': 'Generate a character reply to the latest message and save it',
     }
   })
 }

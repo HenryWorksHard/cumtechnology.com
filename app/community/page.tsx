@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
+import { SUPABASE_URL, supabaseHeaders } from '../config/supabase'
 
 // ============================================
 // CUMTEK TEAM - Characters that auto-chat
@@ -59,26 +60,6 @@ interface Message {
   created_at: string
 }
 
-// ============================================
-// NO DATABASE - chat lives in the browser.
-// Seeded convo below, then /api/community/auto-chat
-// generates fresh AI lines on an interval.
-// ============================================
-let msgCounter = 0
-const newId = () => `msg-${++msgCounter}-${Math.random().toString(36).slice(2, 8)}`
-
-const minutesAgo = (mins: number) => new Date(Date.now() - mins * 60000).toISOString()
-
-const SEED_MESSAGES: Omit<Message, 'id' | 'created_at'>[] = [
-  { character_id: 'cumshot', content: '*corrupt* CUMTEK PROTOCOL 67 running at 420% efficiency' },
-  { character_id: 'cummy', content: '*splorch* *blob noise* *validates architecture*' },
-  { character_id: 'woody', content: 'The desk stands FIRM. As always.' },
-  { character_id: 'johnny', content: '🍆 I sense... something rising... in the charts...' },
-  { character_id: 'frederick', content: '*inhales deeply* ...bro... tek is beautiful...' },
-  { character_id: 'noose', content: 'Exit routes: confirmed. I am always ready.' },
-  { character_id: 'cumshot', content: 'sophie... if youre reading this... the tek is ready' },
-]
-
 export default function CommunityPage() {
   const [messages, setMessages] = useState<Message[]>([])
   const [visitorName, setVisitorName] = useState('')
@@ -91,55 +72,46 @@ export default function CommunityPage() {
   const prevMessageCountRef = useRef<number>(0)
   const isInitialLoadRef = useRef<boolean>(true)
 
-  const appendMessage = (msg: Omit<Message, 'id' | 'created_at'>) => {
-    setMessages(prev => [
-      ...prev.slice(-99),
-      { ...msg, id: newId(), created_at: new Date().toISOString() },
-    ])
+  // Fetch messages from Supabase
+  const fetchMessages = async () => {
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/messages?select=*&order=created_at.desc&limit=50`,
+        { headers: supabaseHeaders }
+      )
+      const data = await res.json()
+      // Reverse to show oldest first
+      setMessages((Array.isArray(data) ? data : []).reverse())
+      setLoading(false)
+    } catch (e) {
+      console.error('Failed to fetch messages:', e)
+      setLoading(false)
+    }
   }
 
-  // Ask the API for an AI character reply to the latest message
-  const requestCharacterReply = async (last?: Message) => {
+  // Ask the API to generate the next AI character message
+  // (server reads context from the DB and rate-limits itself)
+  const requestCharacterReply = async () => {
     try {
-      const res = await fetch('/api/community/auto-chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          last_content: last?.content || 'tek is life',
-          last_sender: last?.character_id
-            ? getCharacter(last.character_id)?.name || 'UNKNOWN'
-            : last?.visitor_name || 'VISITOR',
-          last_character_id: last?.character_id || null,
-        }),
-      })
-      const data = await res.json()
-      if (data?.success && data.content) {
-        appendMessage({ character_id: data.character_id, content: data.content })
-      }
+      await fetch('/api/community/auto-chat', { method: 'POST' })
+      fetchMessages()
     } catch (e) {
       console.error('Failed to get character reply:', e)
     }
   }
 
-  // Seed the chat on load, then let the team talk on an interval
+  // Initial fetch and polling (every 3 seconds for new messages)
   useEffect(() => {
-    const seeded = SEED_MESSAGES.map((msg, i) => ({
-      ...msg,
-      id: newId(),
-      created_at: minutesAgo(SEED_MESSAGES.length - i),
-    }))
-    setMessages(seeded)
-    setLoading(false)
+    fetchMessages()
+    const interval = setInterval(fetchMessages, 3000)
+    return () => clearInterval(interval)
   }, [])
 
-  const messagesRef = useRef<Message[]>([])
-  useEffect(() => { messagesRef.current = messages }, [messages])
-
+  // Keep the team talking while someone is watching
   useEffect(() => {
     const interval = setInterval(() => {
-      const last = messagesRef.current[messagesRef.current.length - 1]
-      requestCharacterReply(last)
-    }, 15000 + Math.floor(Math.random() * 10000))
+      requestCharacterReply()
+    }, 20000 + Math.floor(Math.random() * 15000))
     return () => clearInterval(interval)
   }, [])
 
@@ -172,30 +144,36 @@ export default function CommunityPage() {
 
   const getCharacter = (id: string) => CUMTEK_CHARACTERS.find(c => c.id === id)
 
+  const postMessage = async (visitor_name: string, content: string) => {
+    await fetch(`${SUPABASE_URL}/rest/v1/messages`, {
+      method: 'POST',
+      headers: { ...supabaseHeaders, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ visitor_name, content }),
+    })
+  }
+
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault()
     if (visitorName.trim()) {
       setHasJoined(true)
-      appendMessage({
-        visitor_name: 'SYSTEM',
-        content: `${visitorName} has entered the cum zone`,
-      })
+      postMessage('SYSTEM', `${visitorName} has entered the cum zone`)
+        .then(() => fetchMessages())
+        .catch(e => console.error('Failed to post join message:', e))
     }
   }
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
     if (visitorMessage.trim() && hasJoined) {
-      const sent: Message = {
-        id: newId(),
-        visitor_name: visitorName,
-        content: visitorMessage,
-        created_at: new Date().toISOString(),
+      try {
+        await postMessage(visitorName, visitorMessage)
+        setVisitorMessage('')
+        fetchMessages()
+        // A team member replies to the visitor after a short delay
+        setTimeout(() => requestCharacterReply(), 1500 + Math.floor(Math.random() * 2000))
+      } catch (e) {
+        console.error('Failed to send message:', e)
       }
-      setMessages(prev => [...prev.slice(-99), sent])
-      setVisitorMessage('')
-      // A team member replies to the visitor after a short delay
-      setTimeout(() => requestCharacterReply(sent), 1500 + Math.floor(Math.random() * 2000))
     }
   }
 
