@@ -11,8 +11,8 @@
 const CA = ''
 
 // Social links
-const TWITTER = 'https://x.com/CxM5H0T' // swap in the new X link here when ready
-const TWITTER_HANDLE = '@CxM5H0T'
+const TWITTER = 'https://x.com/CxM5HOT'
+const TWITTER_HANDLE = '@CxM5HOT'
 const GITHUB = 'https://github.com/HenryWorksHard/cumtechnology.com'
 
 // Token info
