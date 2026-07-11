@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { SUPABASE_URL, supabaseHeaders } from '../config/supabase'
 
 // ============================================
-// CUMTEK TEAM - Characters that auto-chat
+// CUMTEK TEAM - shown in the sidebar (watching, not talking)
 // ============================================
 const CUMTEK_CHARACTERS = [
   { 
@@ -89,17 +89,6 @@ export default function CommunityPage() {
     }
   }
 
-  // Ask the API to generate the next AI character message
-  // (server reads context from the DB and rate-limits itself)
-  const requestCharacterReply = async () => {
-    try {
-      await fetch('/api/community/auto-chat', { method: 'POST' })
-      fetchMessages()
-    } catch (e) {
-      console.error('Failed to get character reply:', e)
-    }
-  }
-
   // Initial fetch and polling (every 3 seconds for new messages)
   useEffect(() => {
     fetchMessages()
@@ -118,13 +107,6 @@ export default function CommunityPage() {
     } catch {}
   }, [])
 
-  // Keep the team talking while someone is watching
-  useEffect(() => {
-    const interval = setInterval(() => {
-      requestCharacterReply()
-    }, 20000 + Math.floor(Math.random() * 15000))
-    return () => clearInterval(interval)
-  }, [])
 
   // Auto-scroll to bottom ONLY on initial load OR when new messages arrive
   useEffect(() => {
@@ -189,8 +171,6 @@ export default function CommunityPage() {
         await postMessage(visitorName, visitorMessage)
         setVisitorMessage('')
         fetchMessages()
-        // A team member replies to the visitor after a short delay
-        setTimeout(() => requestCharacterReply(), 1500 + Math.floor(Math.random() * 2000))
       } catch (e) {
         console.error('Failed to send message:', e)
       }
@@ -318,7 +298,7 @@ export default function CommunityPage() {
               </div>
               <div>
                 <p style={{ margin: 0, color: char.color, fontWeight: 'bold', fontSize: '13px' }}>{char.name}</p>
-                <p style={{ margin: 0, color: '#666', fontSize: '10px' }}>Online</p>
+                <p style={{ margin: 0, color: '#666', fontSize: '10px' }}>Watching</p>
               </div>
             </div>
           ))}
@@ -326,8 +306,8 @@ export default function CommunityPage() {
           <div style={{ marginTop: '20px', padding: '10px', background: '#0a0a0a', borderRadius: '5px', border: '1px solid #333' }}>
             <h4 style={{ color: '#00ffff', fontSize: '12px', margin: '0 0 8px 0' }}>ABOUT</h4>
             <p style={{ color: '#888', fontSize: '11px', lineHeight: '1.5', margin: 0 }}>
-              The CUMTEK team chats here 24/7. Each character responds every minute using AI. 
-              They never sleep. Only build tek.
+              This room is for REAL FRIENDS only. The team does not speak here.
+              They watch. They read everything. 他们在看. Only build tek.
             </p>
           </div>
         </div>
@@ -490,7 +470,7 @@ export default function CommunityPage() {
                   type="text"
                   value={visitorMessage}
                   onChange={(e) => setVisitorMessage(e.target.value)}
-                  placeholder="Type your message... (characters will reply)"
+                  placeholder="Type your message... (the team is watching)"
                   maxLength={500}
                   style={{
                     flex: 1,
