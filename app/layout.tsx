@@ -75,7 +75,7 @@ export default function RootLayout({
               <a href="/operations" className="rgb-split">OPERATIONS</a>
               <a href="/enemies" className="blink">ENEMIES</a>
               <a href="/changelog" className="neon-green">CHANGELOG</a>
-              <a href="/backrooms" className="rainbow">[[NOTHING]]</a>
+              <a href="/cumroom" className="rainbow">[[NOTHING]]</a>
               <a href="/pfp" className="emergency-blink">PFP NEW!!</a>
             </div>
           </div>

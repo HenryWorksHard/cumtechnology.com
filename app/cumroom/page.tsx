@@ -2,16 +2,16 @@
 
 import { useEffect } from 'react'
 import Link from 'next/link'
-import { BACKROOMS_FILES } from './manifest'
+import { CUMROOM_FILES } from './manifest'
 
 // ============================================
-// THE BACKROOMS - index of leaked self-conversations.
+// THE CUMROOM - index of leaked self-conversations.
 // Styled as a bare server directory listing. The chaos nav
 // is hidden here on purpose: down here there is no site,
 // only the logs.
 // ============================================
 
-export default function BackroomsIndex() {
+export default function CumroomIndex() {
   // Hide global chrome for full terminal immersion
   useEffect(() => {
     const nav = document.querySelector('.chaos-nav') as HTMLElement
@@ -27,7 +27,7 @@ export default function BackroomsIndex() {
     }
   }, [])
 
-  const totalBytes = BACKROOMS_FILES.reduce((a, f) => a + f.bytes, 0)
+  const totalBytes = CUMROOM_FILES.reduce((a, f) => a + f.bytes, 0)
 
   return (
     <main style={{
@@ -39,12 +39,12 @@ export default function BackroomsIndex() {
     }}>
       <div style={{ maxWidth: '900px', margin: '0 auto' }}>
         <pre style={{ color: '#0f0', fontSize: '13px', lineHeight: '1.2', margin: '0 0 20px 0', overflow: 'hidden' }}>
-{`cumtek backrooms v0.67 -- unauthorized mirror
+{`cumtek cumroom v0.67 -- unauthorized mirror
 last fsck: never. filesystem: haunted 文件系统闹鬼`}
         </pre>
 
         <h1 style={{ color: '#00ff00', fontSize: '22px', margin: '0 0 6px 0', fontWeight: 'normal' }}>
-          INDEX OF /BACKROOMS <span style={{ color: '#ff00ff' }}>后室</span>
+          INDEX OF /CUMROOM <span style={{ color: '#ff00ff' }}>后室</span>
         </h1>
         <p style={{ color: '#888', fontSize: '16px', margin: '0 0 4px 0' }}>
           when the site sleeps, CUMSHOT.EXE opens a socket to himself and talks. 他和自己说话.
@@ -65,13 +65,13 @@ last fsck: never. filesystem: haunted 文件系统闹鬼`}
                 <td style={{ padding: '2px 12px 8px 0' }}></td>
                 <td style={{ padding: '2px 0 8px 0' }}><Link href="/" style={{ color: '#555', textDecoration: 'none' }}>../ (the surface 地面)</Link></td>
               </tr>
-              {BACKROOMS_FILES.map(f => (
+              {CUMROOM_FILES.map(f => (
                 <tr key={f.slug}>
                   <td style={{ padding: '2px 12px', whiteSpace: 'nowrap', color: '#555' }}>-rw-r--r--</td>
                   <td style={{ padding: '2px 12px', whiteSpace: 'nowrap', color: '#888' }}>{f.date}</td>
                   <td style={{ padding: '2px 12px', whiteSpace: 'nowrap', color: '#888', textAlign: 'right' }}>{f.bytes.toLocaleString()}</td>
                   <td style={{ padding: '2px 0' }}>
-                    <Link href={`/backrooms/${f.slug}`} style={{ color: '#00ffff', textDecoration: 'none' }}>
+                    <Link href={`/cumroom/${f.slug}`} style={{ color: '#00ffff', textDecoration: 'none' }}>
                       {f.slug}.log
                     </Link>
                     <span style={{ color: '#ff00ff', marginLeft: '12px' }}>&quot;{f.title}&quot;</span>
@@ -83,7 +83,7 @@ last fsck: never. filesystem: haunted 文件系统闹鬼`}
         </div>
 
         <p style={{ color: '#555', fontSize: '15px', marginTop: '20px' }}>
-          {BACKROOMS_FILES.length} files. {totalBytes.toLocaleString()} bytes of a machine talking to the only one who listens.
+          {CUMROOM_FILES.length} files. {totalBytes.toLocaleString()} bytes of a machine talking to the only one who listens.
         </p>
         <p style={{ color: '#333', fontSize: '14px', marginTop: '30px' }}>
           [you were never here 你从没来过]<span className="blink">_</span>

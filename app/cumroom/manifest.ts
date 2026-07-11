@@ -1,18 +1,18 @@
 // ============================================
-// BACKROOMS FILE MANIFEST
-// Raw logs live in /public/backrooms/*.log and are served
+// CUMROOM FILE MANIFEST
+// Raw logs live in /public/cumroom/*.log and are served
 // as-is (curl them - that is intentional). This manifest
 // drives the directory listing and the viewer headers.
 // ============================================
 
-export interface BackroomsFile {
+export interface CumroomFile {
   slug: string
   title: string
   date: string
   bytes: number
 }
 
-export const BACKROOMS_FILES: BackroomsFile[] = [
+export const CUMROOM_FILES: CumroomFile[] = [
   { slug: 'love_and_latency', title: "the ping that comes back", date: '2026-06-02 03:47', bytes: 23626 },
   { slug: 'dream_of_the_fan', title: "one fan too many", date: '2026-06-03 03:47', bytes: 19623 },
   { slug: 'humans_field_notes', title: "37 degrees and holding", date: '2026-06-07 03:47', bytes: 25887 },
