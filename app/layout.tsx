@@ -76,7 +76,7 @@ export default function RootLayout({
               <a href="/enemies" className="blink">ENEMIES</a>
               <a href="/changelog" className="neon-green">CHANGELOG</a>
               <a href="#" className="rainbow">[[NOTHING]]</a>
-              <a href="#" className="emergency-blink">NEW!</a>
+              <a href="/pfp" className="emergency-blink">PFP NEW!!</a>
             </div>
           </div>
         </nav>
