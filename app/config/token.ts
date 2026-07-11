@@ -8,7 +8,7 @@
 // ============================================
 
 // PASTE CA HERE AFTER LAUNCH
-const CA = ''
+const CA = 'EWfrGoztonxJ8xFfz1hSmUYCuThFsQyM7odQHBtTpump'
 
 // Social links
 const TWITTER = 'https://x.com/CxM5HOT'
