@@ -1917,6 +1917,48 @@ export default function Home() {
             </div>
           </div>
 
+          {/* CHINESE DIVIDER */}
+          <div className="chinese-divider">头 • 像 • 机</div>
+
+          {/* PFP GENERATOR BOX - Windows 2000 dialog style */}
+          <div className="side-box" style={{ padding: 0, border: '2px outset #fff', background: '#c0c0c0' }}>
+            <div style={{
+              background: 'linear-gradient(90deg, #ff00ff, #00ffff)',
+              padding: '4px 8px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <span style={{ color: '#000', fontWeight: 'bold', fontSize: '11px', fontFamily: 'Tahoma, Arial, sans-serif' }}>
+                PFP_GENERATOR.EXE
+              </span>
+              <span style={{ background: '#c0c0c0', border: '1px outset #fff', padding: '0 5px', fontSize: '10px', color: '#000' }}>X</span>
+            </div>
+            <div style={{ padding: '10px', textAlign: 'center' }}>
+              <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#000', fontFamily: 'VT323, monospace', lineHeight: '1.4' }}>
+                WARNING 警告: uploading ur face here has CONSEQUENCES 有后果.
+                the boys WILL move in 他们会搬进来. the floor WILL be handled 地板会被处理.
+                we never see ur image 图片不上传 (we cant afford to)
+              </p>
+              <a href="/pfp" className="chaos-btn" style={{
+                display: 'inline-block',
+                padding: '6px 18px',
+                fontSize: '13px',
+                background: '#ff00ff',
+                border: '2px outset #fff',
+                color: '#000',
+                fontWeight: 'bold',
+                textDecoration: 'none',
+                cursor: 'pointer'
+              }}>
+                MAKE MY PFP 生成
+              </a>
+              <p style={{ margin: '8px 0 0 0', fontSize: '10px', color: '#555', fontFamily: 'VT323, monospace' }}>
+                this window cannot be closed 关不掉的
+              </p>
+            </div>
+          </div>
+
         </div>
 
       </div>
