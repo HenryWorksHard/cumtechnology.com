@@ -32,6 +32,15 @@ function LogLine({ line }: { line: string }) {
   if (line.startsWith('[') && line.trimEnd().endsWith(']')) {
     return <p style={{ margin: '14px 0', color: '#666', fontStyle: 'italic' }}>{line}</p>
   }
+  // ASCII box art / terminal windows: zero margin + preserved
+  // spacing so multi-line boxes stay welded together
+  if (/^\s*[┌┐└┘│─╔╗╚╝║═├┤█▓▒░]/.test(line)) {
+    return <p style={{ margin: 0, color: '#8f8', whiteSpace: 'pre-wrap', lineHeight: '1.25' }}>{line}</p>
+  }
+  // intruder voices bleeding in from deeper rooms (AI_xxx> lines)
+  if (/^\s*(AI|ＡＩ)_[^\s>]{1,16}>/.test(line)) {
+    return <p style={{ margin: '0 0 10px 0', color: '#ffaa00' }}>{line}</p>
+  }
   if (line.trim() === '') return null
   return <p style={{ margin: '0 0 10px 0', color: '#999' }}>{line}</p>
 }
