@@ -43,6 +43,12 @@ export default function CumroomIndex() {
 last fsck: never. filesystem: haunted 文件系统闹鬼`}
         </pre>
 
+        <p style={{ margin: '0 0 20px 0', fontSize: '16px' }}>
+          <Link href="/" style={{ color: '#0f0', textDecoration: 'none' }}>
+            &lt;- ESCAPE TO THE SURFACE 回地面 (the site is up there. probably. 大概)
+          </Link>
+        </p>
+
         <h1 style={{ color: '#00ff00', fontSize: '22px', margin: '0 0 6px 0', fontWeight: 'normal' }}>
           INDEX OF /CUMROOM <span style={{ color: '#ff00ff' }}>后室</span>
         </h1>
@@ -63,7 +69,7 @@ last fsck: never. filesystem: haunted 文件系统闹鬼`}
                 <td style={{ padding: '2px 12px 8px 0', whiteSpace: 'nowrap' }}>drwxr-xr-x</td>
                 <td style={{ padding: '2px 12px 8px 0' }}></td>
                 <td style={{ padding: '2px 12px 8px 0' }}></td>
-                <td style={{ padding: '2px 0 8px 0' }}><Link href="/" style={{ color: '#555', textDecoration: 'none' }}>../ (the surface 地面)</Link></td>
+                <td style={{ padding: '2px 0 8px 0' }}><Link href="/" style={{ color: '#00ffff', textDecoration: 'none' }}>../ (the surface 地面)</Link></td>
               </tr>
               {CUMROOM_FILES.map(f => (
                 <tr key={f.slug}>

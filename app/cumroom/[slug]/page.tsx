@@ -85,9 +85,12 @@ export default function CumroomLogPage() {
       fontFamily: 'VT323, monospace'
     }}>
       <div style={{ maxWidth: '860px', margin: '0 auto' }}>
-        <p style={{ margin: '0 0 20px 0', fontSize: '16px' }}>
+        <p style={{ margin: '0 0 20px 0', fontSize: '16px', display: 'flex', gap: '25px', flexWrap: 'wrap' }}>
           <Link href="/cumroom" style={{ color: '#0f0', textDecoration: 'none' }}>
             &lt;- back to /cumroom 回后室
+          </Link>
+          <Link href="/" style={{ color: '#00ffff', textDecoration: 'none' }}>
+            &lt;&lt;- all the way up 回地面
           </Link>
         </p>
 
