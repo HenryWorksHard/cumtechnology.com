@@ -4,9 +4,13 @@ import type { NextRequest } from 'next/server'
 // COMING SOON MODE - Set to false to disable
 const COMING_SOON_MODE = false
 
+// MAINTENANCE MODE - Set to false to bring the site back
+const MAINTENANCE_MODE = true
+
 // Paths that should bypass coming soon (API routes, assets, etc)
 const BYPASS_PATHS = [
   '/coming-soon',
+  '/maintenance',
   '/api',
   '/_next',
   '/favicon.ico',
@@ -21,21 +25,21 @@ const BYPASS_PATHS = [
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // If coming soon mode is disabled, allow all traffic
-  if (!COMING_SOON_MODE) {
+  // If no pause mode is active, allow all traffic
+  if (!COMING_SOON_MODE && !MAINTENANCE_MODE) {
     return NextResponse.next()
   }
 
   // Check if path should bypass
   const shouldBypass = BYPASS_PATHS.some(path => pathname.startsWith(path))
-  
+
   if (shouldBypass) {
     return NextResponse.next()
   }
 
-  // Redirect all other traffic to coming soon
+  // Redirect all other traffic to the active pause page
   const url = request.nextUrl.clone()
-  url.pathname = '/coming-soon'
+  url.pathname = MAINTENANCE_MODE ? '/maintenance' : '/coming-soon'
   return NextResponse.rewrite(url)
 }
 
